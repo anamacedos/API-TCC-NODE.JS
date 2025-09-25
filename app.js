@@ -41,6 +41,8 @@ app.use((request, response, next) => {
 
 
 const controllerUnidades = require("./controller/unidadesDeSaude/controllerUnidadesDeSaude")
+const controllerLocal = require("./controller/local/controllerLocal.js")
+const controllerCategoria = require("./controller/categoria/controllerCategoria.js")
 
 
 
@@ -97,7 +99,7 @@ app.put('/v1/pas/unidades/:id', cors(), bodyParserJSON, async function(request, 
         //recebe o content type da requisição
         let contentType = request.headers['content-type']
         //recebe o id do jogo
-        let idUnidade = request.params.idUnidade
+        let idUnidade = request.params.id
         //recebe os dados do jogo encaminhado do body da requisição
         let dadosBody = request.body 
 
@@ -107,6 +109,84 @@ app.put('/v1/pas/unidades/:id', cors(), bodyParserJSON, async function(request, 
         response.json(resultUnidade)
 })
 
+
+
+/*****************************************************************
+ * TABELA DE LOCAL
+ *****************************************************************/
+
+//ENDPOINT PARA INSERIR UM LOCAL
+app.post('/v1/pas/local', cors(), bodyParserJSON, async function(request, response) {
+        let contentType = request.headers['content-type']
+
+        let dadosBody = request.body
+
+        let resultLocal = await controllerLocal.inserirLocal(dadosBody, contentType)
+
+        response.status(resultLocal.status_code)
+        response.json(resultLocal)
+        
+})
+
+
+//endpoint para listar local com base no seu id
+app.get('/v1/pas/local/:id', cors(), async function(request, response){
+        //recebe o id do jogo na requisição
+        let idLocal = request.params.id
+        let resultLocal = await controllerLocal.listarLocalPeloId(idLocal)
+
+        response.status(resultLocal.status_code)
+        response.json(resultLocal)
+})
+
+
+//endpoint para retornar uma lista de locais
+app.get('/v1/pas/local', cors(), async function(request, response){
+        //chama a função para listar os jogos
+        let resultLocais = await controllerLocal.listarLocais()
+    
+        response.status(resultLocais.status_code)
+        response.json(resultLocais)
+    
+    })
+
+
+    /*****************************************************************
+ * TABELA DE CATEGORIA
+ *****************************************************************/
+
+ //ENDPOINT PARA INSERIR UMA CATEGORIA
+app.post('/v1/pas/categoria', cors(), bodyParserJSON, async function(request, response) {
+        let contentType = request.headers['content-type']
+
+        let dadosBody = request.body
+
+        let resultCategoria = await controllerCategoria.inserirCategoria(dadosBody, contentType)
+
+        response.status(resultCategoria.status_code)
+        response.json(resultCategoria)
+        
+})
+
+//endpoint para listar todas as categorias
+app.get('/v1/pas/categoria', cors(), async function(request, response){
+        //chama a função para listar os jogos
+        let resultCategorias = await controllerCategoria.listarCategorias()
+    
+        response.status(resultCategorias.status_code)
+        response.json(resultCategorias)
+    
+})
+
+//endpoint para listar uma categoria com base no seu id
+app.get('/v1/pas/categoria/:id', cors(), async function(request, response){
+        //recebe o id do jogo na requisição
+        let idCategoria = request.params.id
+        let resultCategoria = await controllerCategoria.listarCategoriaPeloId(idCategoria)
+
+        response.status(resultCategoria.status_code)
+        response.json(resultCategoria)
+})
 
 app.listen(8080, function(){
     console.log('API aguardando requisições')

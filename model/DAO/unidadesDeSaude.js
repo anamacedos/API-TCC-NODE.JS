@@ -10,7 +10,7 @@ const {PrismaClient} = require ('@prisma/client')
 //instancia da classe do prisma client para gerar um objeto
 const prisma = new PrismaClient()
 
-//Fucao para inserir no Banco de Dados um novo jogo
+//Fucao para inserir no Banco de Dados uma nova unidade de saude
 const inserirUnidadeDeSaude = async function(UnidadeDeSaude){ 
     try {
 
@@ -63,6 +63,8 @@ const selecionarTodasUnidadesDeSaude = async function () {
   
             
     } catch (error) {
+        console.log(error);
+        
         return false
         
         
@@ -73,7 +75,6 @@ const selecionarTodasUnidadesDeSaude = async function () {
 const listarUnidadePeloId = async function(idUnidade){
     try {
         let sql = `select * from tbl_unidade_saude where id = ${idUnidade}`
-
 
         let result = await prisma.$queryRawUnsafe(sql)
 
@@ -91,15 +92,13 @@ const listarUnidadePeloId = async function(idUnidade){
 //atualizar uma unidade de saúde
 const atualizarUnidadeDeSaude = async function (unidadeDeSaude) {
     try {
-        let sql = `update tbl_unidade_saude set nome = '${jogo.nome}',
-                                    telefone = "${jogo.data_lancamento}",
-                                    versao = "${jogo.versao}",
-                                    tamanho = "${jogo.tamanho}",
-                                    descricao = "${jogo.descricao}",
-                                    foto_capa = "${jogo.foto_capa}",
-                                    link = "${jogo.link}",
-                                    id_classificacao_etaria = "${id_classificacao_etaria}"
-                                    where id = ${jogo.id}`
+        let sql = `update tbl_unidade_saude set nome = '${unidadeDeSaude.nome}',
+                                    telefone = "${unidadeDeSaude.telefone}",
+                                    disponibilidade_24h = "${unidadeDeSaude.disponibilidade_24h}",
+                                    foto = "${unidadeDeSaude.foto}",
+                                    tbl_local_id = "${unidadeDeSaude.tbl_local_id}",
+                                    tbl_categoria_id = "${unidadeDeSaude.tbl_categoria_id}"
+                                    where id = ${unidadeDeSaude.id}`
 
         let result = await prisma.$executeRawUnsafe(sql)
         
