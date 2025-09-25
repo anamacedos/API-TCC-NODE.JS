@@ -50,7 +50,6 @@ const controllerUnidades = require("./controller/unidadesDeSaude/controllerUnida
 
 
 //endpoint para inserir uma nova unidade de saúde
-//end ponit para inserir um jogo no banco de dados
 app.post('/v1/pas/unidades', cors(), bodyParserJSON, async function(request, response){
 
     //console.log(request.headers) //printa o cabeçalho (header), com as informações da requisição, como quem pediu e também o formato da requisição (content-type)

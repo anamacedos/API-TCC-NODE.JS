@@ -33,6 +33,7 @@ const listarUnidadesDeSaude = async function(){
         let dadosUnidades = {}
         let resultUnidades = await unidadeDeSaudeDAO.selecionarTodasUnidadesDeSaude()
 
+
         if(resultUnidades != false){
             if(resultUnidades.length > 0 || typeof(resultUnidades == 'object')){
 
@@ -96,23 +97,28 @@ const listarUnidadePeloId = async function(id){
 }
 
 //função para atualizar uma unidade de saúde
-const atualizarUnidadeDeSaude = async function (unidadeDeSaude, id, contentType) {
+const atualizarUnidadeDeSaude = async function (unidadeDeSaude, idUnidade, contentType) {
     try {
         if (contentType == 'application/json'){
-            let resultBusca = await unidadeDeSaudeDAO.listarUnidadePeloId(parseInt(id))
+
+            //verificar se o id existe no banco
+            let resultBusca = await unidadeDeSaudeDAO.listarUnidadePeloId(parseInt(idUnidade))
             console.log(resultBusca);
 
             if(resultBusca.status_code == 200){
-                unidadeDeSaude.id = parseInt(id)
+                unidadeDeSaude.id = parseInt(idUnidade)
                 let result = await unidadeDeSaudeDAO.atualizarUnidadeDeSaude(unidadeDeSaude)
 
                 if (result)
                     return MESSAGE.SUCESS_CREATED_ITEM
                 else 
+                    console.log("321");
                     return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER
             }else if(resultBusca.status_code == 400){
                 return MESSAGE.ERROR_NOT_FOUND
             }else{
+
+                console.log("123");
                 return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER
             }
             
@@ -120,6 +126,7 @@ const atualizarUnidadeDeSaude = async function (unidadeDeSaude, id, contentType)
             return MESSAGE.ERROR_CONTENT_TYPE
         }
     } catch (error) {
+        console.log(error);
         return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER
     }
     

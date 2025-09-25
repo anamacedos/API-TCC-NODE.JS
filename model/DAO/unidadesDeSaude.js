@@ -49,29 +49,30 @@ const inserirUnidadeDeSaude = async function(UnidadeDeSaude){
 //função para retornar do banco de dados uma lista de unidades de saúde
 const selecionarTodasUnidadesDeSaude = async function () {
     try {
-        let sql = `(select * from tbl_unidade_saude order by id desc)`
+        let sql = `select * from tbl_unidade_saude order by id desc`
 
         //para fazer select é o query, para insert, update ou delete é o execute
 
         let result = await prisma.$queryRawUnsafe(sql)
-        
+
 
         if(result)
             return result
         else
-            console.log(result);
+            return false
+  
             
     } catch (error) {
         return false
-        console.log(error);
+        
         
     }
 }
 
 //selecionar uma unidade de saúde pelo id
-const listarUnidadePeloId = async function(id){
+const listarUnidadePeloId = async function(idUnidade){
     try {
-        let sql = `select * from tbl_unidade_saude where id = ${id}`
+        let sql = `select * from tbl_unidade_saude where id = ${idUnidade}`
 
 
         let result = await prisma.$queryRawUnsafe(sql)
@@ -99,6 +100,7 @@ const atualizarUnidadeDeSaude = async function (unidadeDeSaude) {
                                     link = "${jogo.link}",
                                     id_classificacao_etaria = "${id_classificacao_etaria}"
                                     where id = ${jogo.id}`
+
         let result = await prisma.$executeRawUnsafe(sql)
         
         if(result)
@@ -116,5 +118,6 @@ const atualizarUnidadeDeSaude = async function (unidadeDeSaude) {
 module.exports = {
     inserirUnidadeDeSaude,
     selecionarTodasUnidadesDeSaude,
-    listarUnidadePeloId
+    listarUnidadePeloId,
+    atualizarUnidadeDeSaude
 }
