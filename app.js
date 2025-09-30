@@ -43,6 +43,8 @@ app.use((request, response, next) => {
 const controllerUnidades = require("./controller/unidadesDeSaude/controllerUnidadesDeSaude")
 const controllerLocal = require("./controller/local/controllerLocal.js")
 const controllerCategoria = require("./controller/categoria/controllerCategoria.js")
+const controllerEspecialidade = require("./controller/especialidade/controllerEspecialidade.js")
+const controllerEspecialidadeUnidade = require("./controller/unidadesDeSaude/controllerUnidadeEspecialidade")
 
 
 
@@ -109,6 +111,38 @@ app.put('/v1/pas/unidades/:id', cors(), bodyParserJSON, async function(request, 
         response.json(resultUnidade)
 })
 
+
+
+// endpoint para filtrar unidades com ou sem parametros
+app.post('/v1/pas/unidades/filtrar', cors(), bodyParserJSON, async function(request, response) {
+        try {
+            let { especialidade, categoria, disponibilidade } = request.body
+    
+            let result = await controllerUnidades.filtrarUnidadeDeSaude(
+                Number(especialidade) || 0,
+                Number(categoria) || 0,
+                disponibilidade === undefined ? null : disponibilidade
+            )
+    
+            response.status(result.status_code)
+            response.json(result)
+    
+        } catch (error) {
+            console.error(error)
+            response.status(500).json({ status: false, message: 'Erro interno no servidor.' })
+        }
+    })
+
+
+//endpoint para pesquisar pelo nome
+app.get('/v1/pas/pesquisa/:nome', cors(), async function(request, response){
+        //recebe o id do jogo na requisição
+        let nomeDigitado = request.params.nome
+        let resultUnidade = await controllerUnidades.pesquisarUnidadePeloNome(nomeDigitado)
+
+        response.status(resultUnidade.status_code)
+        response.json(resultUnidade)
+})
 
 
 /*****************************************************************
@@ -187,6 +221,44 @@ app.get('/v1/pas/categoria/:id', cors(), async function(request, response){
         response.status(resultCategoria.status_code)
         response.json(resultCategoria)
 })
+
+//endpoint de filtros
+// app.get('/v1/pas/categoria/:id', cors(), async function(request, response){
+//         //recebe o id do jogo na requisição
+//         let idCategoria = request.params.id
+//         let resultCategoria = await controllerCategoria.listarCategoriaPeloId(idCategoria)
+
+//         response.status(resultCategoria.status_code)
+//         response.json(resultCategoria)
+// })
+
+
+/*****************************************************************
+ * TABELA DE ESPECIALIDADE
+ *****************************************************************/
+
+
+    //endpoint para retornar uma lista de unidades de saúde
+app.get('/v1/pas/especialidade', cors(), async function(request, response){
+        //chama a função para listar os jogos
+        let resultEspecialidades = await controllerEspecialidade.listarEspecialidades()
+    
+        response.status(resultEspecialidades.status_code)
+        response.json(resultEspecialidades)
+    
+    })
+
+
+    //endpoint para listar as especialidades de uma unidade com base no id 
+app.get('/v1/pas/especialidade/:id', cors(), async function(request, response){
+        //recebe o id do jogo na requisição
+        let idUnidade = request.params.id
+        let resultEspecialidades = await controllerEspecialidadeUnidade.listarEspecialidadePeloIdUnidade(idUnidade)
+
+        response.status(resultEspecialidades.status_code)
+        response.json(resultEspecialidades)
+})
+    
 
 app.listen(8080, function(){
     console.log('API aguardando requisições')

@@ -6,6 +6,7 @@
  ********************************************************************************/
 //Import da biblioteca do prisma client para executar scripts no banco de dados
 const {PrismaClient} = require ('@prisma/client')
+const res = require('express/lib/response')
 
 //instancia da classe do prisma client para gerar um objeto
 const prisma = new PrismaClient()
@@ -103,7 +104,7 @@ const atualizarUnidadeDeSaude = async function (unidadeDeSaude) {
         let result = await prisma.$executeRawUnsafe(sql)
         
         if(result)
-            return true
+            return result
         else
             return false
         
@@ -114,9 +115,92 @@ const atualizarUnidadeDeSaude = async function (unidadeDeSaude) {
     
 }
 
+// filtrar unidades de UnidadeDeSaude
+// const filtrarUnidadeDeSaude = async function (idEspecialidade, idCategoria, disponibilidade) {
+//     try {
+//         // monta os parâmetros corretamente
+//         let paramDisponibilidade = (disponibilidade === null || disponibilidade === undefined) 
+//             ? 'NULL' 
+//             : `${disponibilidade}`
+
+//         let sql = `CALL filtrar_unidades(${idEspecialidade}, ${idCategoria}, ${paramDisponibilidade})`
+
+//         let result = await prisma.$queryRawUnsafe(sql)
+
+//         if (result)
+//             return result
+//         else
+//             return false
+
+//     } catch (error) {
+//         console.log(error)
+//         return false
+//     }
+// }
+
+const filtrarUnidadeDeSaude = async function(idEspecialidade, idCategoria, disponibilidade) {
+    try {
+        let sql = `
+        SELECT DISTINCT 
+            u.id AS id,
+            u.nome AS nome,
+            u.telefone AS telefone,
+            fn_disponibilidade_texto(u.disponibilidade_24h) AS disponibilidade,
+            u.foto AS foto,
+            c.nome AS categoria,
+            l.logradouro AS logradouro,
+            l.bairro AS bairro,
+            l.cidade AS cidade,
+            l.estado AS estado
+        FROM tbl_unidade_saude u
+        JOIN tbl_unidade_especialidade ue 
+            ON ue.fk_unidade_saude_id = u.id
+        JOIN tbl_categoria c 
+            ON c.id = u.tbl_categoria_id
+        JOIN tbl_local l 
+            ON l.id = u.tbl_local_id
+        WHERE 
+            (${idEspecialidade} = 0 OR ue.fk_especialidade_id = ${idEspecialidade})
+            AND (${idCategoria} = 0 OR u.tbl_categoria_id = ${idCategoria})
+            AND (${disponibilidade === null ? '1=1' : 'u.disponibilidade_24h = ' + disponibilidade})
+        `
+
+        let result = await prisma.$queryRawUnsafe(sql)
+        return result || []
+
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+
+//função para fazer uma pesquisa pelo nome
+const pesquisarNomeUnidade = async function(nomeDigitado){
+    try {
+        let sql = `
+        SELECT *
+        FROM tbl_unidade_saude
+        WHERE nome LIKE '%${nomeDigitado}%'
+        `
+        let result = await prisma.$queryRawUnsafe(sql)
+
+        if (result)
+            return result
+        else
+            return false
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+
 module.exports = {
     inserirUnidadeDeSaude,
     selecionarTodasUnidadesDeSaude,
     listarUnidadePeloId,
-    atualizarUnidadeDeSaude
+    atualizarUnidadeDeSaude,
+    filtrarUnidadeDeSaude,
+    pesquisarNomeUnidade
 }

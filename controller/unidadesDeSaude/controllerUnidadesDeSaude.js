@@ -8,6 +8,7 @@ const MESSAGE = require('../../modulo/config.js')
 const unidadeDeSaudeDAO = require('../../model/DAO/unidadesDeSaude.js')
 const controllerLocal = require('../local/controllerLocal.js')
 const controllerCategoria = require('../categoria/controllerCategoria.js')
+const controllerUnidadeEspecialidade = require('../unidadesDeSaude/controllerUnidadeEspecialidade')
 
 
 //Função para inserir uma unidade de saúde
@@ -29,64 +30,60 @@ const inserirUnidadeDeSaude = async function (unidadeDeSaude, contentType) {
     }
 }
 
-//Função para listar todas as unidades de saúde
 const listarUnidadesDeSaude = async function(){
     try {
         let dadosUnidades = {}
         let resultUnidades = await unidadeDeSaudeDAO.selecionarTodasUnidadesDeSaude()
 
-
         if(resultUnidades != false){
-            if(resultUnidades.length > 0 || typeof(resultUnidades == 'object')){
+            if(resultUnidades.length > 0 || typeof(resultUnidades) == 'object'){
 
-                //definindo os dados do objeto json que será retornado
+                // Definindo os dados do objeto JSON que será retornado
                 dadosUnidades.status = true
                 dadosUnidades.status_code = 200
                 dadosUnidades.item = resultUnidades.length
-                //dadosUnidades.unidadesDeSaude = resultUnidades
+                dadosUnidades.unidadesDeSaude = []  
 
-                for (itemUnidade of resultUnidades){
+                for (let itemUnidade of resultUnidades){
                     
-                    //local
+                    // Local
                     let dadosLocal = await controllerLocal.listarLocalPeloId(itemUnidade.tbl_local_id)
-
                     itemUnidade.local = dadosLocal
-
                     delete itemUnidade.tbl_local_id
-
                     delete itemUnidade.local.status
                     delete itemUnidade.local.status_code
 
-                    //categoria
+                    // Categoria
                     let dadosCategoria = await controllerCategoria.listarCategoriaPeloId(itemUnidade.tbl_categoria_id)
-
                     itemUnidade.categoria = dadosCategoria
-
                     delete itemUnidade.tbl_categoria_id
                     delete itemUnidade.categoria.status
                     delete itemUnidade.categoria.status_code
-                }
 
-                dadosUnidades.unidadeDeSaude = itemUnidade
+                    //especialidade
+                    let dadosEspecialidade = await controllerUnidadeEspecialidade.listarEspecialidadePeloIdUnidade(itemUnidade.id)
+                    itemUnidade.especialidades = dadosEspecialidade
+
+                    // Adiciona a unidade no array
+                    dadosUnidades.unidadesDeSaude.push(itemUnidade)
+                    delete itemUnidade.especialidades.status
+                    delete itemUnidade.especialidades.status_code
+                }
 
                 return dadosUnidades
 
-    
-            }else{
+            } else {
                 return MESSAGE.ERROR_NOT_FOUND
             } 
-        }else{
-            
+        } else {
             return MESSAGE.ERROR_INTERNAL_SERVER_MODEL
-
-            
         }
     } catch (error) {
         console.log(error);
         return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER
-        
     }
 }
+
 
 //fução para listar a unidade de saúde pelo id
 const listarUnidadePeloId = async function(id){
@@ -129,6 +126,16 @@ const listarUnidadePeloId = async function(id){
                         delete itemUnidade.tbl_categoria_id
                         delete itemUnidade.categoria.status
                         delete itemUnidade.categoria.status_code
+
+
+                        //ESPECIALIDADE
+                        let dadosEspecialidade = await controllerUnidadeEspecialidade.listarEspecialidadePeloIdUnidade(itemUnidade.id)
+
+                        itemUnidade.especialidades = dadosEspecialidade
+
+                        delete itemUnidade.especialidades.status
+                        delete itemUnidade.especialidades.status_code
+
 
                         
                         
@@ -190,10 +197,87 @@ const atualizarUnidadeDeSaude = async function (unidadeDeSaude, idUnidade, conte
     
 }
 
+//função para retornar baseado nos filtros
+
+const filtrarUnidadeDeSaude = async function (idEspecialidade, idCategoria, disponibilidade) {
+    try {
+      // Normaliza parâmetros
+      idEspecialidade = (!idEspecialidade || isNaN(idEspecialidade)) ? 0 : idEspecialidade
+      idCategoria = (!idCategoria || isNaN(idCategoria)) ? 0 : idCategoria
+  
+      let dadosUnidades = {}
+      let resultUnidades = await unidadeDeSaudeDAO.filtrarUnidadeDeSaude(idEspecialidade, idCategoria, disponibilidade)
+  
+      if (resultUnidades && resultUnidades.length > 0) {
+        dadosUnidades.status = true
+        dadosUnidades.status_code = 200
+        dadosUnidades.unidadesDeSaude = []
+  
+        for (let itemUnidade of resultUnidades) {
+            let unidadeCompleta = await listarUnidadePeloId(itemUnidade.id)
+            if(unidadeCompleta.status) {
+                dadosUnidades.unidadesDeSaude.push(unidadeCompleta.unidadeDeSaude)
+            }
+        }
+        
+  
+        return dadosUnidades
+      } else {
+        return MESSAGE.ERROR_NOT_FOUND
+      }
+  
+    } catch (error) {
+      console.log(error)
+      return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
+  }
+
+  // Função para pesquisar unidades pelo nome
+const pesquisarUnidadePeloNome = async function(nomeDigitado) {
+    try {
+        // validação: não pode vir vazio
+        if (!nomeDigitado || nomeDigitado.trim() === "") {
+            return MESSAGE.ERROR_REQUIRED_FIELDS
+        }
+
+        let dadosUnidades = {}
+        let resultUnidades = await unidadeDeSaudeDAO.pesquisarNomeUnidade(nomeDigitado)
+
+        if (resultUnidades && resultUnidades.length > 0) {
+            dadosUnidades.status = true
+            dadosUnidades.status_code = 200
+            dadosUnidades.unidadesDeSaude = []
+
+            // reaproveita a função de listar pelo id para montar cada unidade completa
+            for (let itemUnidade of resultUnidades) {
+                let unidadeCompleta = await listarUnidadePeloId(itemUnidade.id)
+                
+                // como listarUnidadePeloId já devolve {status, status_code, unidadeDeSaude}
+                // aqui pegamos apenas a parte "unidadeDeSaude"
+                if (unidadeCompleta && unidadeCompleta.unidadeDeSaude) {
+                    dadosUnidades.unidadesDeSaude.push(unidadeCompleta.unidadeDeSaude)
+                }
+            }
+
+            return dadosUnidades
+        } else {
+            return MESSAGE.ERROR_NOT_FOUND
+        }
+
+    } catch (error) {
+        console.log(error)
+        return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
+}
+
+  
+
 
 module.exports = {
     inserirUnidadeDeSaude,
     listarUnidadesDeSaude,
     listarUnidadePeloId,
-    atualizarUnidadeDeSaude
+    atualizarUnidadeDeSaude,
+    filtrarUnidadeDeSaude,
+    pesquisarUnidadePeloNome
 }
