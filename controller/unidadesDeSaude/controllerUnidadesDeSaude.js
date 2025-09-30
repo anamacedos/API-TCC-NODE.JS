@@ -43,7 +43,31 @@ const listarUnidadesDeSaude = async function(){
                 dadosUnidades.status = true
                 dadosUnidades.status_code = 200
                 dadosUnidades.item = resultUnidades.length
-                dadosUnidades.unidadesDeSaude = resultUnidades
+                //dadosUnidades.unidadesDeSaude = resultUnidades
+
+                for (itemUnidade of resultUnidades){
+                    
+                    //local
+                    let dadosLocal = await controllerLocal.listarLocalPeloId(itemUnidade.tbl_local_id)
+
+                    itemUnidade.local = dadosLocal
+
+                    delete itemUnidade.tbl_local_id
+
+                    delete itemUnidade.local.status
+                    delete itemUnidade.local.status_code
+
+                    //categoria
+                    let dadosCategoria = await controllerCategoria.listarCategoriaPeloId(itemUnidade.tbl_categoria_id)
+
+                    itemUnidade.categoria = dadosCategoria
+
+                    delete itemUnidade.tbl_categoria_id
+                    delete itemUnidade.categoria.status
+                    delete itemUnidade.categoria.status_code
+                }
+
+                dadosUnidades.unidadeDeSaude = itemUnidade
 
                 return dadosUnidades
 
@@ -58,6 +82,7 @@ const listarUnidadesDeSaude = async function(){
             
         }
     } catch (error) {
+        console.log(error);
         return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER
         
     }
