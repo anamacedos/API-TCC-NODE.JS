@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,4 +5,79 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model tbl_categoria {
+  id                Int                 @id @default(autoincrement())
+  nome              String              @unique(map: "nome") @db.VarChar(100)
+  tbl_unidade_saude tbl_unidade_saude[]
+}
+
+model tbl_consulta {
+  id                  Int               @id @default(autoincrement())
+  tempo_entrada       DateTime          @db.DateTime(0)
+  tempo_saida         DateTime          @db.DateTime(0)
+  fk_unidade_saude_id Int
+  fk_especialidade_id Int
+  tbl_unidade_saude   tbl_unidade_saude @relation(fields: [fk_unidade_saude_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "tbl_consulta_ibfk_1")
+  tbl_especialidade   tbl_especialidade @relation(fields: [fk_especialidade_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "tbl_consulta_ibfk_2")
+
+  @@index([fk_especialidade_id], map: "fk_especialidade_id")
+  @@index([fk_unidade_saude_id], map: "fk_unidade_saude_id")
+}
+
+model tbl_especialidade {
+  id                        Int                         @id @default(autoincrement())
+  nome                      String                      @unique(map: "nome") @db.VarChar(100)
+  tbl_consulta              tbl_consulta[]
+  tbl_unidade_especialidade tbl_unidade_especialidade[]
+}
+
+model tbl_local {
+  id                Int                 @id @default(autoincrement())
+  cep               String              @db.VarChar(9)
+  logradouro        String              @db.VarChar(100)
+  bairro            String              @db.VarChar(100)
+  cidade            String              @db.VarChar(100)
+  estado            String              @db.VarChar(50)
+  regiao            String              @db.VarChar(20)
+  tbl_unidade_saude tbl_unidade_saude[]
+}
+
+model tbl_log {
+  id              Int       @id @default(autoincrement())
+  tabela          String?   @db.VarChar(100)
+  acao            String?   @db.VarChar(50)
+  data_hora       DateTime? @default(now()) @db.DateTime(0)
+  usuario         String?   @db.VarChar(100)
+  registro_id     Int?
+  valores_antigos String?   @db.Text
+  valores_novos   String?   @db.Text
+}
+
+model tbl_unidade_especialidade {
+  fk_especialidade_id Int
+  fk_unidade_saude_id Int
+  tbl_especialidade   tbl_especialidade @relation(fields: [fk_especialidade_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "tbl_unidade_especialidade_ibfk_1")
+  tbl_unidade_saude   tbl_unidade_saude @relation(fields: [fk_unidade_saude_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "tbl_unidade_especialidade_ibfk_2")
+
+  @@id([fk_especialidade_id, fk_unidade_saude_id])
+  @@index([fk_unidade_saude_id], map: "fk_unidade_saude_id")
+}
+
+model tbl_unidade_saude {
+  id                        Int                         @id @default(autoincrement())
+  nome                      String                      @db.VarChar(100)
+  telefone                  String                      @db.VarChar(20)
+  disponibilidade_24h       Boolean?                    @default(false)
+  foto                      String?                     @db.VarChar(5000)
+  tbl_local_id              Int
+  tbl_categoria_id          Int
+  tbl_consulta              tbl_consulta[]
+  tbl_unidade_especialidade tbl_unidade_especialidade[]
+  tbl_local                 tbl_local                   @relation(fields: [tbl_local_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "tbl_unidade_saude_ibfk_1")
+  tbl_categoria             tbl_categoria               @relation(fields: [tbl_categoria_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "tbl_unidade_saude_ibfk_2")
+
+  @@index([tbl_categoria_id], map: "tbl_categoria_id")
+  @@index([tbl_local_id], map: "tbl_local_id")
 }

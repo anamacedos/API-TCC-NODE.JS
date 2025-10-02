@@ -238,7 +238,7 @@ app.get('/v1/pas/categoria/:id', cors(), async function(request, response){
  *****************************************************************/
 
 
-    //endpoint para retornar uma lista de unidades de saúde
+    //endpoint para retornar uma lista de especialidades
 app.get('/v1/pas/especialidade', cors(), async function(request, response){
         //chama a função para listar os jogos
         let resultEspecialidades = await controllerEspecialidade.listarEspecialidades()
