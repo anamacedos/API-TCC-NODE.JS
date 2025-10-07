@@ -14,12 +14,15 @@ const prisma = new PrismaClient()
 const inserirCategoria = async function(categoria) {
 
     try {
-        let sql = `insert into tbl_categoria(
-                    nome
-
-        )values(
-        '${categoria.nome}'
-        )`
+        let sql = `insert into tbl_categoria (
+    nome,
+    foto_claro,
+    foto_escuro
+) values (
+    '${categoria.nome}',
+    '${categoria.foto_claro}',
+    '${categoria.foto_escuro}'
+)`
 
         let result = await prisma.$executeRawUnsafe(sql)
 
