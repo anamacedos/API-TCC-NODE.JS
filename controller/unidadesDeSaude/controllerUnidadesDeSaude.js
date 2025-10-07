@@ -30,6 +30,8 @@ const inserirUnidadeDeSaude = async function (unidadeDeSaude, contentType) {
     }
 }
 
+//função para listar todas as unidades de saúde
+
 const listarUnidadesDeSaude = async function(){
     try {
         let dadosUnidades = {}

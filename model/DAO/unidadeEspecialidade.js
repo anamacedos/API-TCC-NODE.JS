@@ -15,15 +15,17 @@ const prisma = new PrismaClient()
 const selecionarTodasEspecialidadesDaUnidade = async function (idUnidade) {
     try {
         let sql = `
-        SELECT 
-            e.id, 
-            e.nome,
-            e.foto
-        FROM tbl_especialidade e
-        JOIN tbl_unidade_especialidade ue 
-            ON e.id = ue.fk_especialidade_id
-        WHERE ue.fk_unidade_saude_id = ${idUnidade}
-    `
+    SELECT 
+        e.id, 
+        e.nome,
+        e.foto_claro,
+        e.foto_escuro
+    FROM tbl_especialidade e
+    JOIN tbl_unidade_especialidade ue 
+        ON e.id = ue.fk_especialidade_id
+    WHERE ue.fk_unidade_saude_id = ${idUnidade}
+`
+
 
         //para fazer select é o query, para insert, update ou delete é o execute
 

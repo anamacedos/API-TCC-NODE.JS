@@ -23,7 +23,7 @@ const listarEspecialidadePeloIdUnidade = async function(idUnidade){
 
                     dadosEspecialidade.status = true
                     dadosEspecialidade.status_code = 200
-                    dadosEspecialidade.endereco = resulEspecialidades
+                    dadosEspecialidade.especialidades = resulEspecialidades
 
                     return dadosEspecialidade
                 }else{
