@@ -202,6 +202,8 @@ app.post('/v1/pas/categoria', cors(), bodyParserJSON, async function(request, re
         
 })
 
+
+
 //endpoint para listar todas as categorias
 app.get('/v1/pas/categoria', cors(), async function(request, response){
         //chama a função para listar os jogos
@@ -257,6 +259,24 @@ app.get('/v1/pas/especialidade/:id', cors(), async function(request, response){
 
         response.status(resultEspecialidades.status_code)
         response.json(resultEspecialidades)
+})
+
+/*****************************************************************
+ * TABELA RELACIONAMENTO DE ESPECIALIDADE E CATEGORIA
+ *****************************************************************/
+
+
+//END POINT PARA RETORNAR O TEMPO DE ESPERA BASEADO NO ID DA UNIDADE E DA ESPECIALIDADE
+app.post('/v1/pas/tempo', cors(), bodyParserJSON, async function(request, response) {
+        let contentType = request.headers['content-type']
+
+        let dadosBody = request.body
+
+        let resultTempoDeEspera = await controllerEspecialidadeUnidade.listarTempoDeEspera(dadosBody, contentType)
+
+        response.status(resultTempoDeEspera.status_code)
+        response.json(resultTempoDeEspera)
+        
 })
     
 

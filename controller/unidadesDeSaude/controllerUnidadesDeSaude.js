@@ -47,6 +47,20 @@ const listarUnidadesDeSaude = async function(){
                 dadosUnidades.unidadesDeSaude = []  
 
                 for (let itemUnidade of resultUnidades){
+
+                    // TEMPO DE ESPERA GERAL DA UNIDADE
+                    let parametros = {
+                        "idUnidade": itemUnidade.id,
+                        "idEspecialidade": null
+                    }
+                    let tempoGer = await controllerUnidadeEspecialidade.listarTempoDeEspera(parametros)
+
+                    tempoGeral = tempoGer.tempo
+
+
+                    for (campos of tempoGeral){
+                        itemUnidade.tempo_espera_geral = campos.f1
+                    }
                     
                     // Local
                     let dadosLocal = await controllerLocal.listarLocalPeloId(itemUnidade.tbl_local_id)
@@ -65,6 +79,26 @@ const listarUnidadesDeSaude = async function(){
                     //especialidade
                     let dadosEspecialidade = await controllerUnidadeEspecialidade.listarEspecialidadePeloIdUnidade(itemUnidade.id)
                     itemUnidade.especialidades = dadosEspecialidade
+
+                    // TEMPO DE ESPERA POR ESPECIALIDADE
+                    if (dadosEspecialidade.especialidades && dadosEspecialidade.especialidades.length > 0) {
+                        for (let especialidade of dadosEspecialidade.especialidades) {
+
+                            let parametros = {
+                                "idUnidade": itemUnidade.id,
+                                "idEspecialidade": especialidade.id
+                            }
+
+                            let tempoEsp = await controllerUnidadeEspecialidade.listarTempoDeEspera(parametros)
+
+                            tempoEspera = tempoEsp.tempo
+
+                            for(campos of tempoEspera){
+                                especialidade.tempo_espera = campos.f2
+                            }
+    
+                        }
+                    }
 
                     // Adiciona a unidade no array
                     dadosUnidades.unidadesDeSaude.push(itemUnidade)
@@ -87,81 +121,96 @@ const listarUnidadesDeSaude = async function(){
 }
 
 
-//fução para listar a unidade de saúde pelo id
-const listarUnidadePeloId = async function(id){
+const listarUnidadePeloId = async function(id) {
     try {
-        if(id == "" || id == undefined || id == null || isNaN(id) || id<=0){
-            
+        if (id == "" || id == undefined || id == null || isNaN(id) || id <= 0) {
             return MESSAGE.ERROR_REQUIRED_FIELDS
-        }else{
+        } else {
             const arrayUnidades = []
             let dadosUnidade = {}
-            let resultUnidade = await unidadeDeSaudeDAO.listarUnidadePeloId(parseInt(id)) //se caso chegar um numero decimal, o parse int pega só a parte inteira
-            
-            if (resultUnidade != false){
+            let resultUnidade = await unidadeDeSaudeDAO.listarUnidadePeloId(parseInt(id))
 
-                if (resultUnidade.length > 0 || typeof(resultUnidade) == 'object'){
-
-                    //cria um objeto do tipo json para retornar a lista de jogos
-                    dadosUnidade.status = true
-                    dadosUnidade.status_code = 200
-                    //dadosUnidade.unidadeDeSaude = resultUnidade
+            if (resultUnidade != false) {
+                if (resultUnidade.length > 0 || typeof(resultUnidade) == 'object') {
                     
+                    for (itemUnidade of resultUnidade) {
 
-                    for (itemUnidade of resultUnidade){
+                        //TEMPO DE ESPERA GERAL DA UNIDADE
+                        let parametros = {
+                            "idUnidade": itemUnidade.id,
+                            "idEspecialidade": null
+                        }
+                        let tempoGer = await controllerUnidadeEspecialidade.listarTempoDeEspera(parametros)
+
+                        tempoGeral = tempoGer.tempo
+
+
+                        for (campos of tempoGeral){
+                            itemUnidade.tempo_espera_geral = campos.f1
+                        }
+
 
                         //LOCAL
                         let dadosLocal = await controllerLocal.listarLocalPeloId(itemUnidade.tbl_local_id)
-
                         itemUnidade.local = dadosLocal
-
                         delete itemUnidade.tbl_local_id
-
                         delete itemUnidade.local.status
                         delete itemUnidade.local.status_code
 
                         //CATEGORIA
                         let dadosCategoria = await controllerCategoria.listarCategoriaPeloId(itemUnidade.tbl_categoria_id)
-
                         itemUnidade.categoria = dadosCategoria
-
                         delete itemUnidade.tbl_categoria_id
                         delete itemUnidade.categoria.status
                         delete itemUnidade.categoria.status_code
 
-
-                        //ESPECIALIDADE
+                        //ESPECIALIDADES
                         let dadosEspecialidade = await controllerUnidadeEspecialidade.listarEspecialidadePeloIdUnidade(itemUnidade.id)
 
-                        itemUnidade.especialidades = dadosEspecialidade
+                        // TEMPO DE ESPERA POR ESPECIALIDADE
+                        if (dadosEspecialidade.especialidades && dadosEspecialidade.especialidades.length > 0) {
+                            for (let especialidade of dadosEspecialidade.especialidades) {
 
+                                let parametros = {
+                                    "idUnidade": itemUnidade.id,
+                                    "idEspecialidade": especialidade.id
+                                }
+
+                                let tempoEsp = await controllerUnidadeEspecialidade.listarTempoDeEspera(parametros)
+
+                                tempoEspera = tempoEsp.tempo
+
+                                for(campos of tempoEspera){
+                                    especialidade.tempo_espera = campos.f2
+                                }
+        
+                            }
+                        }
+
+                        itemUnidade.especialidades = dadosEspecialidade
                         delete itemUnidade.especialidades.status
                         delete itemUnidade.especialidades.status_code
-
-
-                        
-                        
                     }
 
+                    dadosUnidade.status = true
+                    dadosUnidade.status_code = 200
                     dadosUnidade.unidadeDeSaude = itemUnidade
 
                     return dadosUnidade
-                }else{
+                } else {
                     return MESSAGE.ERROR_NOT_FOUND
-
                 }
-            }else{
+            } else {
                 return MESSAGE.ERROR_INTERNAL_SERVER_MODEL
             }
+
         }
-        
     } catch (error) {
         console.log(error)
         return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER
-        
     }
-
 }
+
 
 //função para atualizar uma unidade de saúde
 const atualizarUnidadeDeSaude = async function (unidadeDeSaude, idUnidade, contentType) {
@@ -170,7 +219,7 @@ const atualizarUnidadeDeSaude = async function (unidadeDeSaude, idUnidade, conte
 
             //verificar se o id existe no banco
             let resultBusca = await unidadeDeSaudeDAO.listarUnidadePeloId(parseInt(idUnidade))
-            console.log(resultBusca);
+
 
             if(resultBusca.status_code == 200){
                 unidadeDeSaude.id = parseInt(idUnidade)
@@ -179,13 +228,12 @@ const atualizarUnidadeDeSaude = async function (unidadeDeSaude, idUnidade, conte
                 if (result)
                     return MESSAGE.SUCESS_CREATED_ITEM
                 else 
-                    console.log("321");
+
                     return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER
             }else if(resultBusca.status_code == 400){
                 return MESSAGE.ERROR_NOT_FOUND
             }else{
 
-                console.log("123");
                 return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER
             }
             

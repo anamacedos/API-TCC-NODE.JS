@@ -65,12 +65,10 @@ const selecionarTodasCategorias = async function () {
 const listarCategoriaPeloId = async function(idCategoria){
     try {
         let sql = `select * from tbl_categoria where id = ${idCategoria}`
-
-        console.log(sql);
         
         let result = await prisma.$queryRawUnsafe(sql)
 
-        console.log(result);
+
         
 
         if (result)

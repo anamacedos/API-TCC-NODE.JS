@@ -73,11 +73,9 @@ const listarLocalPeloId = async function(idLocal){
     try {
         let sql = `select * from tbl_local where id = ${idLocal}`
 
-        console.log(sql);
         
         let result = await prisma.$queryRawUnsafe(sql)
 
-        console.log(result);
         
 
         if (result)
