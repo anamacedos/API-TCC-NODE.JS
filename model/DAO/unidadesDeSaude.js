@@ -90,6 +90,25 @@ const listarUnidadePeloId = async function(idUnidade){
     
 }
 
+//selecionar uma unidade de saude pelo id (utilizando a procedure)
+
+const listarUnidadePeloIdPro = async function (idUnidade){
+    try {
+
+        let sql = `SELECT * FROM vw_unidade_completa WHERE unidade_id = ${idUnidade}`
+
+        let result = await prisma.$queryRawUnsafe(sql)
+
+        if (result)
+            return result
+        else
+            return false
+        
+    } catch (error) {
+        
+    }
+}
+
 //atualizar uma unidade de saúde
 const atualizarUnidadeDeSaude = async function (unidadeDeSaude) {
     try {
@@ -202,5 +221,6 @@ module.exports = {
     listarUnidadePeloId,
     atualizarUnidadeDeSaude,
     filtrarUnidadeDeSaude,
-    pesquisarNomeUnidade
+    pesquisarNomeUnidade,
+    listarUnidadePeloIdPro
 }

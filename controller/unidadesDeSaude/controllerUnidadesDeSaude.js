@@ -120,7 +120,7 @@ const listarUnidadesDeSaude = async function(){
     }
 }
 
-
+//função para listar uma unidade de saúde com base no seu id
 const listarUnidadePeloId = async function(id) {
     try {
         if (id == "" || id == undefined || id == null || isNaN(id) || id <= 0) {
@@ -195,6 +195,42 @@ const listarUnidadePeloId = async function(id) {
                     dadosUnidade.status = true
                     dadosUnidade.status_code = 200
                     dadosUnidade.unidadeDeSaude = itemUnidade
+
+                    return dadosUnidade
+                } else {
+                    return MESSAGE.ERROR_NOT_FOUND
+                }
+            } else {
+                return MESSAGE.ERROR_INTERNAL_SERVER_MODEL
+            }
+
+        }
+    } catch (error) {
+        console.log(error)
+        return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
+}
+
+//função para retornar uma unidade de saude com base no seu id pela procedure
+const listarUnidadePeloIdPro = async function(id) {
+    try {
+        if (id == "" || id == undefined || id == null || isNaN(id) || id <= 0) {
+            return MESSAGE.ERROR_REQUIRED_FIELDS
+        } else {
+       //     const arrayUnidades = []
+            let dadosUnidade = {}
+            let resultUnidade = await unidadeDeSaudeDAO.listarUnidadePeloIdPro(parseInt(id))
+
+            console.log(resultUnidade);
+
+            if (resultUnidade != false) {
+                if (resultUnidade.length > 0 || typeof(resultUnidade) == 'object') {
+                    
+                    
+
+                    dadosUnidade.status = true
+                    dadosUnidade.status_code = 200
+                    dadosUnidade.unidadeDeSaude = resultUnidade
 
                     return dadosUnidade
                 } else {
@@ -329,5 +365,6 @@ module.exports = {
     listarUnidadePeloId,
     atualizarUnidadeDeSaude,
     filtrarUnidadeDeSaude,
-    pesquisarUnidadePeloNome
+    pesquisarUnidadePeloNome,
+    listarUnidadePeloIdPro
 }

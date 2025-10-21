@@ -41,7 +41,7 @@ const inserirCategoria = async function(categoria) {
 //função para listar todas as categorias
 const selecionarTodasCategorias = async function () {
     try {
-        let sql = `select * from tbl_categoria order by id desc`
+        let sql = `select * from tbl_categoria order by id asc`
 
         //para fazer select é o query, para insert, update ou delete é o execute
 

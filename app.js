@@ -85,6 +85,17 @@ app.get('/v1/pas/unidades', cors(), async function(request, response){
 })
 
 //endpoint para listar uma unidade com base no seu id
+app.get('/v1/pas/unidades/pro/:id', cors(), async function(request, response){
+        //recebe o id do jogo na requisição
+        let idUnidade = request.params.id
+        let resultUnidade = await controllerUnidades.listarUnidadePeloIdPro(idUnidade)
+
+        response.status(resultUnidade.status_code)
+        response.json(resultUnidade)
+})
+
+
+//endpoint para listar uma unidade com base no seu id
 app.get('/v1/pas/unidades/:id', cors(), async function(request, response){
         //recebe o id do jogo na requisição
         let idUnidade = request.params.id

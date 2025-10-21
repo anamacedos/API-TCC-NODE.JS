@@ -14,7 +14,7 @@ const prisma = new PrismaClient()
 //função para listar todas as especialidades
 const selecionarTodasEspecialidades = async function () {
     try {
-        let sql = `select * from tbl_especialidade order by id desc`
+        let sql = `select * from tbl_especialidade order by id asc`
 
         //para fazer select é o query, para insert, update ou delete é o execute
 
