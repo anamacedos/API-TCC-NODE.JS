@@ -50,9 +50,17 @@ const selecionarTodasEspecialidadesDaUnidade = async function (idUnidade) {
 //função para chamar a procedure com base no id na unidade e da especialidade
 const listarTempoDeEspera = async function(parametros){
     try {
-        let sql = `CALL tempo_medio_espera(${parametros.idUnidade}, ${parametros.idEspecialidade});`
+
+        //console.log(parametros)
+        let sql = `CALL tempo_medio_espera(${parametros.idUnidade}, ${parametros.idEspecialidade})`
+
+        //console.log(sql)
+
+        //console.log("parametroossss:", parametros);
 
         let result = await prisma.$queryRawUnsafe(sql)
+
+        //console.log("resultddddddd", result);
 
         if (result)
             return result

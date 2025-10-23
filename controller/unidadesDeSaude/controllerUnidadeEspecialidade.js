@@ -39,27 +39,38 @@ const listarEspecialidadePeloIdUnidade = async function(idUnidade){
         return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER
     }
 
+
 }
 
+let contador = 0
 
 // função de chamada da procedure
 const listarTempoDeEspera = async function(parametros){
     try {
+
+        //console.log(parametros)
         if(parametros.idUnidade == '' || parametros.idUnidade == undefined || parametros.idUnidade == null || isNaN(parametros.idUnidade) || parametros.idUnidade<=0){
 
-            console.log(`id da controller Unidade especialidade ${parametros}`);
             return MESSAGE.ERROR_REQUIRED_FIELDS
         }else{
             if(parametros.idEspecialidade == '' || parametros.idEspecialidade == undefined || parametros.idEspecialidade == null || isNaN(parametros.idEspecialidade) || parametros.idEspecialidade<=0){
+
+                contador++
+
+
                 parametros.idEspecialidade = null
                 let dados = {}
+
                 let result = await unidadeEspecialidadeDAO.listarTempoDeEspera(parametros)
 
                 if (result != false){
                     if(result.length > 0 || typeof(result) == 'object'){
+
                         dados.status = true
                         dados.status_code = 200
                         dados.tempo = result
+
+                        //console.log("RETORNANDO:", dados)
 
                         return dados
                     }else{
@@ -69,16 +80,32 @@ const listarTempoDeEspera = async function(parametros){
                     MESSAGE.ERROR_INTERNAL_SERVER_MODEL
                 }
             }else{
+
+                //console.log("b")
+
                 let dados = {}
+                contador++
                 let result = await unidadeEspecialidadeDAO.listarTempoDeEspera(parametros)
+
+                //console.log("b result:", result)
 
                 if (result != false){
                     if(result.length > 0 || typeof(result) == 'object'){
+
+                        //console.log(`RESULT 2 : ${result}`)
+
                         dados.status = true
                         dados.status_code = 200
                         dados.tempo = result
 
+                        //console.log(` CONTROLLER UNI ESP ${dados}`);
+
+                        //console.log("dados", dados);
+
+                        console.log("requisicoes no banco: " + contador)
+
                         return dados
+
                     }else{
                         MESSAGE.ERROR_NOT_FOUND
                     }
@@ -86,10 +113,13 @@ const listarTempoDeEspera = async function(parametros){
                     MESSAGE.ERROR_INTERNAL_SERVER_MODEL
                 }
             }
+
+            
         }
     } catch (error) {
         
     }
+
 }
 
 module.exports = {

@@ -31,6 +31,8 @@ const listarCategorias = async function(){
         let dadosCategorias = {}
         let resultCategorias = await categoriaDAO.selecionarTodasCategorias()
 
+        console.log(resultCategorias);
+
 
         if(resultCategorias != false){
             if(resultCategorias.length > 0 || typeof(resultCategorias == 'object')){

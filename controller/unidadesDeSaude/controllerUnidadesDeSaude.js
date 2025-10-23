@@ -9,6 +9,7 @@ const unidadeDeSaudeDAO = require('../../model/DAO/unidadesDeSaude.js')
 const controllerLocal = require('../local/controllerLocal.js')
 const controllerCategoria = require('../categoria/controllerCategoria.js')
 const controllerUnidadeEspecialidade = require('../unidadesDeSaude/controllerUnidadeEspecialidade')
+const { param } = require('express/lib/application')
 
 
 //Função para inserir uma unidade de saúde
@@ -82,6 +83,7 @@ const listarUnidadesDeSaude = async function(){
 
                     // TEMPO DE ESPERA POR ESPECIALIDADE
                     if (dadosEspecialidade.especialidades && dadosEspecialidade.especialidades.length > 0) {
+
                         for (let especialidade of dadosEspecialidade.especialidades) {
 
                             let parametros = {
@@ -89,9 +91,16 @@ const listarUnidadesDeSaude = async function(){
                                 "idEspecialidade": especialidade.id
                             }
 
+
                             let tempoEsp = await controllerUnidadeEspecialidade.listarTempoDeEspera(parametros)
 
+                            //console.log(tempoEsp)
+
+                            //console.log("TEMPO ESP: ", tempoEsp)
+
                             tempoEspera = tempoEsp.tempo
+
+                            //console.log(tempoEsp.tempo);
 
                             for(campos of tempoEspera){
                                 especialidade.tempo_espera = campos.f2
@@ -220,8 +229,6 @@ const listarUnidadePeloIdPro = async function(id) {
        //     const arrayUnidades = []
             let dadosUnidade = {}
             let resultUnidade = await unidadeDeSaudeDAO.listarUnidadePeloIdPro(parseInt(id))
-
-            console.log(resultUnidade);
 
             if (resultUnidade != false) {
                 if (resultUnidade.length > 0 || typeof(resultUnidade) == 'object') {
