@@ -72,10 +72,54 @@ const selecionarTodasUnidadesDeSaude = async function () {
     }
 }
 
+
+//função para retornar do banco de dados uma lista de unidades de saúde PELA VIEW
+const selecionarTodasUnidadesDeSaudeView = async function () {
+    try {
+        let sql = `select * from vw_unidades_completas`
+
+        //para fazer select é o query, para insert, update ou delete é o execute
+
+        let result = await prisma.$queryRawUnsafe(sql)
+
+
+        if(result)
+            return result
+        else
+            return false
+  
+            
+    } catch (error) {
+        console.log(error);
+        
+        return false
+        
+        
+    }
+}
+
 //selecionar uma unidade de saúde pelo id
 const listarUnidadePeloId = async function(idUnidade){
     try {
         let sql = `select * from tbl_unidade_saude where id = ${idUnidade}`
+
+        let result = await prisma.$queryRawUnsafe(sql)
+
+        if (result)
+            return result
+        else
+            return false
+        
+    } catch (error) {
+        return false
+    }
+    
+}
+
+//selecionar uma unidade de saúde pelo id PELA VIEW
+const listarUnidadePeloIdView = async function(idUnidade){
+    try {
+        let sql = `select * from vw_unidades_completas where id = ${idUnidade}`
 
         let result = await prisma.$queryRawUnsafe(sql)
 
@@ -222,5 +266,7 @@ module.exports = {
     atualizarUnidadeDeSaude,
     filtrarUnidadeDeSaude,
     pesquisarNomeUnidade,
-    listarUnidadePeloIdPro
+    listarUnidadePeloIdPro,
+    selecionarTodasUnidadesDeSaudeView,
+    listarUnidadePeloIdView
 }

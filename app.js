@@ -84,7 +84,18 @@ app.get('/v1/pas/unidades', cors(), async function(request, response){
 
 })
 
-//endpoint para listar uma unidade com base no seu id
+
+//endpoint para retornar uma lista de unidades de saúde PELA VIEW
+app.get('/v1/pas/unidades/view', cors(), async function(request, response){
+        //chama a função para listar os jogos
+        let resultUnidades = await controllerUnidades.listarUnidadesDeSaudeView()
+    
+        response.status(resultUnidades.status_code)
+        response.json(resultUnidades)
+    
+    })
+
+//endpoint para listar uma unidade com base no seu id PELA PROCEDURE
 app.get('/v1/pas/unidades/pro/:id', cors(), async function(request, response){
         //recebe o id do jogo na requisição
         let idUnidade = request.params.id
