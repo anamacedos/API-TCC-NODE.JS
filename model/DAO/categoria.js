@@ -41,7 +41,7 @@ const inserirCategoria = async function(categoria) {
 //função para listar todas as categorias
 const selecionarTodasCategorias = async function () {
     try {
-        let sql = `select * from tbl_categoria order by id desc`
+        let sql = `select * from tbl_categoria order by id asc`
 
         //para fazer select é o query, para insert, update ou delete é o execute
 
@@ -65,12 +65,10 @@ const selecionarTodasCategorias = async function () {
 const listarCategoriaPeloId = async function(idCategoria){
     try {
         let sql = `select * from tbl_categoria where id = ${idCategoria}`
-
-        console.log(sql);
         
         let result = await prisma.$queryRawUnsafe(sql)
 
-        console.log(result);
+
         
 
         if (result)

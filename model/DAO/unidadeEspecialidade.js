@@ -47,18 +47,20 @@ const selecionarTodasEspecialidadesDaUnidade = async function (idUnidade) {
     }
 }
 
-
-//função para chamar a procedure de tempo de espera
-const chamarProcedureTempo = async function(idUnidade, idEspecialidade){
+//função para chamar a procedure com base no id na unidade e da especialidade
+const listarTempoDeEspera = async function(parametros){
     try {
-        let sql = ``
 
-        console.log(sql);
-        
+        //console.log(parametros)
+        let sql = `CALL tempo_medio_espera(${parametros.idUnidade}, ${parametros.idEspecialidade})`
+
+        //console.log(sql)
+
+        //console.log("parametroossss:", parametros);
+
         let result = await prisma.$queryRawUnsafe(sql)
 
-        console.log(result);
-        
+        //console.log("resultddddddd", result);
 
         if (result)
             return result
@@ -73,5 +75,5 @@ const chamarProcedureTempo = async function(idUnidade, idEspecialidade){
 
 module.exports = {
     selecionarTodasEspecialidadesDaUnidade,
-    chamarProcedureTempo
+    listarTempoDeEspera
 }

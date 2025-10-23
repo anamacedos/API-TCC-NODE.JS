@@ -75,7 +75,7 @@ app.post('/v1/pas/unidades', cors(), bodyParserJSON, async function(request, res
 
 
 //endpoint para retornar uma lista de unidades de saúde
-app.get('/v1/pas/unidades', cors(), async function(request, response){
+app.get('/v1/pas/unidades/lento', cors(), async function(request, response){
     //chama a função para listar os jogos
     let resultUnidades = await controllerUnidades.listarUnidadesDeSaude()
 
@@ -84,8 +84,40 @@ app.get('/v1/pas/unidades', cors(), async function(request, response){
 
 })
 
-//endpoint para listar uma unidade com base no seu id
+
+//endpoint para retornar uma lista de unidades de saúde PELA VIEW
+app.get('/v1/pas/unidades', cors(), async function(request, response){
+        //chama a função para listar os jogos
+        let resultUnidades = await controllerUnidades.listarUnidadesDeSaudeView()
+    
+        response.status(resultUnidades.status_code)
+        response.json(resultUnidades)
+    
+    })
+
+//endpoint para listar uma unidade com base no seu id PELA PROCEDURE
+app.get('/v1/pas/unidades/pro/:id', cors(), async function(request, response){
+        //recebe o id do jogo na requisição
+        let idUnidade = request.params.id
+        let resultUnidade = await controllerUnidades.listarUnidadePeloIdPro(idUnidade)
+
+        response.status(resultUnidade.status_code)
+        response.json(resultUnidade)
+})
+
+//endpoint para listar uma unidade com base no seu id PELA VIEW
 app.get('/v1/pas/unidades/:id', cors(), async function(request, response){
+        //recebe o id do jogo na requisição
+        let idUnidade = request.params.id
+        let resultUnidade = await controllerUnidades.listarUnidadePeloIdView(idUnidade)
+
+        response.status(resultUnidade.status_code)
+        response.json(resultUnidade)
+})
+
+
+//endpoint para listar uma unidade com base no seu id
+app.get('/v1/pas/unidades/lento:id', cors(), async function(request, response){
         //recebe o id do jogo na requisição
         let idUnidade = request.params.id
         let resultUnidade = await controllerUnidades.listarUnidadePeloId(idUnidade)
@@ -202,6 +234,8 @@ app.post('/v1/pas/categoria', cors(), bodyParserJSON, async function(request, re
         
 })
 
+
+
 //endpoint para listar todas as categorias
 app.get('/v1/pas/categoria', cors(), async function(request, response){
         //chama a função para listar os jogos
@@ -257,6 +291,24 @@ app.get('/v1/pas/especialidade/:id', cors(), async function(request, response){
 
         response.status(resultEspecialidades.status_code)
         response.json(resultEspecialidades)
+})
+
+/*****************************************************************
+ * TABELA RELACIONAMENTO DE ESPECIALIDADE E CATEGORIA
+ *****************************************************************/
+
+
+//END POINT PARA RETORNAR O TEMPO DE ESPERA BASEADO NO ID DA UNIDADE E DA ESPECIALIDADE
+app.post('/v1/pas/tempo', cors(), bodyParserJSON, async function(request, response) {
+        let contentType = request.headers['content-type']
+
+        let dadosBody = request.body
+
+        let resultTempoDeEspera = await controllerEspecialidadeUnidade.listarTempoDeEspera(dadosBody, contentType)
+
+        response.status(resultTempoDeEspera.status_code)
+        response.json(resultTempoDeEspera)
+        
 })
     
 

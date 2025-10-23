@@ -72,6 +72,32 @@ const selecionarTodasUnidadesDeSaude = async function () {
     }
 }
 
+
+//função para retornar do banco de dados uma lista de unidades de saúde PELA VIEW
+const selecionarTodasUnidadesDeSaudeView = async function () {
+    try {
+        let sql = `select * from vw_unidades_completas`
+
+        //para fazer select é o query, para insert, update ou delete é o execute
+
+        let result = await prisma.$queryRawUnsafe(sql)
+
+
+        if(result)
+            return result
+        else
+            return false
+  
+            
+    } catch (error) {
+        console.log(error);
+        
+        return false
+        
+        
+    }
+}
+
 //selecionar uma unidade de saúde pelo id
 const listarUnidadePeloId = async function(idUnidade){
     try {
@@ -88,6 +114,43 @@ const listarUnidadePeloId = async function(idUnidade){
         return false
     }
     
+}
+
+//selecionar uma unidade de saúde pelo id PELA VIEW
+const listarUnidadePeloIdView = async function(idUnidade){
+    try {
+        let sql = `select * from vw_unidades_completas where id_unidade = ${idUnidade}`
+
+        let result = await prisma.$queryRawUnsafe(sql)
+
+        if (result)
+            return result
+        else
+            return false
+        
+    } catch (error) {
+        return false
+    }
+    
+}
+
+//selecionar uma unidade de saude pelo id (utilizando a procedure)
+
+const listarUnidadePeloIdPro = async function (idUnidade){
+    try {
+
+        let sql = `SELECT * FROM vw_unidade_completa WHERE unidade_id = ${idUnidade}`
+
+        let result = await prisma.$queryRawUnsafe(sql)
+
+        if (result)
+            return result
+        else
+            return false
+        
+    } catch (error) {
+        
+    }
 }
 
 //atualizar uma unidade de saúde
@@ -202,5 +265,8 @@ module.exports = {
     listarUnidadePeloId,
     atualizarUnidadeDeSaude,
     filtrarUnidadeDeSaude,
-    pesquisarNomeUnidade
+    pesquisarNomeUnidade,
+    listarUnidadePeloIdPro,
+    selecionarTodasUnidadesDeSaudeView,
+    listarUnidadePeloIdView
 }
