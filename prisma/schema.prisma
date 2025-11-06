@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
+  url      = "mysql://senaijandirakappa:Tcc12345678%40@senaijandirakappa.mysql.database.azure.com:3306/db_pas?sslaccept=strict"
 }
 
 model tbl_categoria {

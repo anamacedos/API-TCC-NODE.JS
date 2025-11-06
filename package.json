@@ -1,4 +1,6 @@
 {
+  "scripts":{
+    "start":"npx prisma generate && node app.js"},
   "dependencies": {
     "@prisma/client": "^6.16.2",
     "body-parser": "^2.2.0",
