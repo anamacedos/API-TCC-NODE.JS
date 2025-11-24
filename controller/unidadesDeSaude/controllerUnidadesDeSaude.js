@@ -199,7 +199,9 @@ const listarUnidadesDeSaudeView = async function() {
                                     bairro: row.bairro,
                                     cidade: row.cidade,
                                     estado: row.estado,
-                                    regiao: row.regiao
+                                    regiao: row.regiao,
+                                    latitude: row.latitude,
+                                    longitude: row.longitude
                                 }
                             ]
                         },
@@ -418,7 +420,9 @@ const listarUnidadePeloIdView = async function (idUnidade) {
                                     bairro: row.bairro,
                                     cidade: row.cidade,
                                     estado: row.estado,
-                                    regiao: row.regiao
+                                    regiao: row.regiao,
+                                    latitude: row.latitude,
+                                    longitude: row.longitude
                                 }
                             ]
                         },
