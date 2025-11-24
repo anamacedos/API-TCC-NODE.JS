@@ -626,5 +626,7 @@ module.exports = {
     listarUnidadePeloIdPro,
     listarUnidadesDeSaudeView,
     listarCategoriaPeloIdView,
+    listarUnidadePeloIdView,
+    listarCategoriaPeloIdView,
     listarUnidadePeloIdView
 }
