@@ -119,7 +119,7 @@ const listarUnidadePeloId = async function(idUnidade){
 //selecionar uma unidade de saúde pelo id PELA VIEW
 const listarUnidadePeloIdView = async function(idUnidade){
     try {
-        let sql = `select * from vw_unidades_completas where id = ${idUnidade}`
+        let sql = `select * from vw_unidades_completas where id_unidade = ${idUnidade}`
 
         let result = await prisma.$queryRawUnsafe(sql)
 

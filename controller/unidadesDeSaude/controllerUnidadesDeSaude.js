@@ -31,129 +31,9 @@ const inserirUnidadeDeSaude = async function (unidadeDeSaude, contentType) {
     }
 }
 
-//função para listar todas as unidades de saúde PELA VIEW
-// const listarUnidadesDeSaudeView = async function(){
-//     try {
-//         let dadosUnidades = {}
-//         let resultUnidades = await unidadeDeSaudeDAO.selecionarTodasUnidadesDeSaudeView()
-
-
-
-//         if(resultUnidades != false){
-//             if(resultUnidades.length > 0 || typeof(resultUnidades == 'object')){
-
-//                 //definindo os dados do objeto json que será retornado
-//                 dadosUnidades.status = true
-//                 dadosUnidades.status_code = 200
-//                 dadosUnidades.item = resultUnidades.length
-//                 dadosUnidades.unidades = resultUnidades
-
-//                 return dadosUnidades
-
-    
-//             }else{
-//                 return MESSAGE.ERROR_NOT_FOUND
-//             } 
-//         }else{
-            
-//             return MESSAGE.ERROR_INTERNAL_SERVER_MODEL
-
-            
-//         }
-//     } catch (error) {
-//         console.log(error);
-        
-//         return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER
-        
-//     }
-// }
-
-//função para listar todas as unidades de saúde PELA VIEW
-const listarUnidadesDeSaudeView = async function() {
-    try {
-        let dadosUnidades = {};
-        let resultUnidades = await unidadeDeSaudeDAO.selecionarTodasUnidadesDeSaudeView();
-
-        if (resultUnidades && resultUnidades.length > 0) {
-
-            // objeto temporário para agrupar unidades
-            const unidadesMap = {};
-
-            resultUnidades.forEach(row => {
-                const idUnidade = row.id_unidade;
-
-                // se ainda não existe essa unidade no map, cria ela
-                if (!unidadesMap[idUnidade]) {
-                    unidadesMap[idUnidade] = {
-                        id: row.id_unidade,
-                        nome: row.nome_unidade,
-                        telefone: row.telefone,
-                        disponibilidade_24h: row.disponibilidade_24h,
-                        foto: row.foto_unidade,
-                        tempo_espera_geral: row.tempo_espera_geral,
-                        local: {
-                            endereco: [
-                                {
-                                    id: row.id_local,
-                                    cep: row.cep,
-                                    logradouro: row.logradouro,
-                                    bairro: row.bairro,
-                                    cidade: row.cidade,
-                                    estado: row.estado,
-                                    regiao: row.regiao
-                                }
-                            ]
-                        },
-                        categoria: {
-                            categoria: [
-                                {
-                                    id: row.id_categoria,
-                                    nome: row.nome_categoria,
-                                    foto_claro: row.categoria_foto_claro,
-                                    foto_escuro: row.categoria_foto_escuro
-                                }
-                            ]
-                        },
-                        especialidades: {
-                            especialidades: []
-                        }
-                    };
-                }
-
-                // adiciona a especialidade atual ao array da unidade
-                unidadesMap[idUnidade].especialidades.especialidades.push({
-                    id: row.id_especialidade,
-                    nome: row.nome_especialidade,
-                    foto_claro: row.especialidade_foto_claro,
-                    foto_escuro: row.especialidade_foto_escuro,
-                    tempo_espera: row.tempo_espera_especialidade
-                });
-            });
-
-            // transforma o map em um array
-            const unidadesArray = Object.values(unidadesMap);
-
-            // monta o objeto final no padrão solicitado
-            dadosUnidades.status = true;
-            dadosUnidades.status_code = 200;
-            dadosUnidades.item = unidadesArray.length;
-            dadosUnidades.unidadesDeSaude = unidadesArray;
-
-            return dadosUnidades;
-
-        } else {
-            return MESSAGE.ERROR_NOT_FOUND;
-        }
-
-    } catch (error) {
-        console.error(error);
-        return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER;
-    }
-};
-
-
 //função para listar todas as unidades de saúde
-
+//  (essa função faz diversas requisições no banco de dados, o que deixa o tempo de resposta lento,
+//  por isso ela não está sendo utilizada mais, e sim a de baixo)
 const listarUnidadesDeSaude = async function(){
     try {
         let dadosUnidades = {}
@@ -249,6 +129,129 @@ const listarUnidadesDeSaude = async function(){
         return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER
     }
 }
+
+//função para listar todas as unidades de saúde PELA VIEW
+// const listarUnidadesDeSaudeView = async function(){
+//     try {
+//         let dadosUnidades = {}
+//         let resultUnidades = await unidadeDeSaudeDAO.selecionarTodasUnidadesDeSaudeView()
+
+
+
+//         if(resultUnidades != false){
+//             if(resultUnidades.length > 0 || typeof(resultUnidades == 'object')){
+
+//                 //definindo os dados do objeto json que será retornado
+//                 dadosUnidades.status = true
+//                 dadosUnidades.status_code = 200
+//                 dadosUnidades.item = resultUnidades.length
+//                 dadosUnidades.unidades = resultUnidades
+
+//                 return dadosUnidades
+
+    
+//             }else{
+//                 return MESSAGE.ERROR_NOT_FOUND
+//             } 
+//         }else{
+            
+//             return MESSAGE.ERROR_INTERNAL_SERVER_MODEL
+
+            
+//         }
+//     } catch (error) {
+//         console.log(error);
+        
+//         return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER
+        
+//     }
+// }
+
+//função para listar todas as unidades de saúde PELA VIEW (através de uma view retorna todos os tempos de espera sem precisar de tantas requisições como a outra função)
+const listarUnidadesDeSaudeView = async function() {
+    try {
+        let dadosUnidades = {}
+        let resultUnidades = await unidadeDeSaudeDAO.selecionarTodasUnidadesDeSaudeView();
+
+        if (resultUnidades && resultUnidades.length > 0) {
+
+            // objeto temporário para agrupar unidades
+            const unidadesMap = {}
+
+            resultUnidades.forEach(row => {
+                const idUnidade = row.id_unidade
+
+                // se ainda não existe essa unidade no map, cria ela
+                if (!unidadesMap[idUnidade]) {
+                    unidadesMap[idUnidade] = {
+                        id: row.id_unidade,
+                        nome: row.nome_unidade,
+                        telefone: row.telefone,
+                        disponibilidade_24h: row.disponibilidade_24h,
+                        foto: row.foto_unidade,
+                        tempo_espera_geral: row.tempo_espera_geral,
+                        local: {
+                            endereco: [
+                                {
+                                    id: row.id_local,
+                                    cep: row.cep,
+                                    logradouro: row.logradouro,
+                                    bairro: row.bairro,
+                                    cidade: row.cidade,
+                                    estado: row.estado,
+                                    regiao: row.regiao
+                                }
+                            ]
+                        },
+                        categoria: {
+                            categoria: [
+                                {
+                                    id: row.id_categoria,
+                                    nome: row.nome_categoria,
+                                    foto_claro: row.categoria_foto_claro,
+                                    foto_escuro: row.categoria_foto_escuro
+                                }
+                            ]
+                        },
+                        especialidades: {
+                            especialidades: []
+                        }
+                    }
+                }
+
+                // adiciona a especialidade atual ao array da unidade
+                unidadesMap[idUnidade].especialidades.especialidades.push({
+                    id: row.id_especialidade,
+                    nome: row.nome_especialidade,
+                    foto_claro: row.especialidade_foto_claro,
+                    foto_escuro: row.especialidade_foto_escuro,
+                    tempo_espera: row.tempo_espera_especialidade
+                })
+            })
+
+            // transforma o map em um array
+            const unidadesArray = Object.values(unidadesMap)
+
+            // monta o objeto final no padrão solicitado
+            dadosUnidades.status = true
+            dadosUnidades.status_code = 200
+            dadosUnidades.item = unidadesArray.length
+            dadosUnidades.unidadesDeSaude = unidadesArray
+
+            return dadosUnidades
+
+        } else {
+            return MESSAGE.ERROR_NOT_FOUND
+        }
+
+    } catch (error) {
+        console.error(error)
+        return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
+}
+
+
+
 
 //função para listar uma unidade de saúde com base no seu id
 const listarUnidadePeloId = async function(id) {
@@ -375,6 +378,98 @@ const listarUnidadePeloIdPro = async function(id) {
     }
 }
 
+// Função para listar uma unidade específica pela VIEW
+const listarUnidadePeloIdView = async function (idUnidade) {
+    try {
+        // validação do ID
+        if (
+            idUnidade == '' || idUnidade == undefined || idUnidade == null || isNaN(idUnidade) || idUnidade <= 0
+        ) {
+            return MESSAGE.ERROR_REQUIRED_FIELDS
+        }
+
+        // busca a unidade pelo ID
+        let dadosUnidades = {}
+        let resultUnidades = await unidadeDeSaudeDAO.listarUnidadePeloIdView(parseInt(idUnidade))
+
+        if (resultUnidades && resultUnidades.length > 0) {
+
+            // objeto temporário para agrupar a unidade
+            const unidadesMap = {}
+
+            resultUnidades.forEach(row => {
+                const idUnidade = row.id_unidade
+
+                // se ainda não existe essa unidade no map, cria ela
+                if (!unidadesMap[idUnidade]) {
+                    unidadesMap[idUnidade] = {
+                        id: row.id_unidade,
+                        nome: row.nome_unidade,
+                        telefone: row.telefone,
+                        disponibilidade_24h: row.disponibilidade_24h,
+                        foto: row.foto_unidade,
+                        tempo_espera_geral: row.tempo_espera_geral,
+                        local: {
+                            endereco: [
+                                {
+                                    id: row.id_local,
+                                    cep: row.cep,
+                                    logradouro: row.logradouro,
+                                    bairro: row.bairro,
+                                    cidade: row.cidade,
+                                    estado: row.estado,
+                                    regiao: row.regiao
+                                }
+                            ]
+                        },
+                        categoria: {
+                            categoria: [
+                                {
+                                    id: row.id_categoria,
+                                    nome: row.nome_categoria,
+                                    foto_claro: row.categoria_foto_claro,
+                                    foto_escuro: row.categoria_foto_escuro
+                                }
+                            ]
+                        },
+                        especialidades: {
+                            especialidades: []
+                        }
+                    }
+                }
+
+                // adiciona a especialidade atual ao array da unidade
+                unidadesMap[idUnidade].especialidades.especialidades.push({
+                    id: row.id_especialidade,
+                    nome: row.nome_especialidade,
+                    foto_claro: row.especialidade_foto_claro,
+                    foto_escuro: row.especialidade_foto_escuro,
+                    tempo_espera: row.tempo_espera_especialidade
+                })
+            })
+
+            // transforma o map em um array (mesmo que só tenha uma unidade)
+            const unidadesArray = Object.values(unidadesMap)
+
+            // monta o objeto final no padrão solicitado
+            dadosUnidades.status = true
+            dadosUnidades.status_code = 200
+            dadosUnidades.item = unidadesArray.length
+            dadosUnidades.unidadesDeSaude = unidadesArray
+
+            return dadosUnidades
+
+        } else {
+            return MESSAGE.ERROR_NOT_FOUND
+        }
+
+    } catch (error) {
+        console.error(error)
+        return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
+}
+
+
 
 //função para atualizar uma unidade de saúde
 const atualizarUnidadeDeSaude = async function (unidadeDeSaude, idUnidade, contentType) {
@@ -446,7 +541,6 @@ const listarCategoriaPeloIdView = async function(idUnidade){
 }
 
 //função para retornar baseado nos filtros
-
 const filtrarUnidadeDeSaude = async function (idEspecialidade, idCategoria, disponibilidade) {
     try {
       // Normaliza parâmetros
@@ -462,9 +556,10 @@ const filtrarUnidadeDeSaude = async function (idEspecialidade, idCategoria, disp
         dadosUnidades.unidadesDeSaude = []
   
         for (let itemUnidade of resultUnidades) {
-            let unidadeCompleta = await listarUnidadePeloId(itemUnidade.id)
+            let unidadeCompleta = await listarUnidadePeloIdView(itemUnidade.id)
             if(unidadeCompleta.status) {
-                dadosUnidades.unidadesDeSaude.push(unidadeCompleta.unidadeDeSaude)
+                dadosUnidades.unidadesDeSaude.push(unidadeCompleta.unidadesDeSaude)
+
             }
         }
         
@@ -498,12 +593,12 @@ const pesquisarUnidadePeloNome = async function(nomeDigitado) {
 
             // reaproveita a função de listar pelo id para montar cada unidade completa
             for (let itemUnidade of resultUnidades) {
-                let unidadeCompleta = await listarUnidadePeloId(itemUnidade.id)
+                let unidadeCompleta = await listarUnidadePeloIdView(itemUnidade.id)
                 
                 // como listarUnidadePeloId já devolve {status, status_code, unidadeDeSaude}
                 // aqui pegamos apenas a parte "unidadeDeSaude"
-                if (unidadeCompleta && unidadeCompleta.unidadeDeSaude) {
-                    dadosUnidades.unidadesDeSaude.push(unidadeCompleta.unidadeDeSaude)
+                if (unidadeCompleta && unidadeCompleta.unidadesDeSaude) {
+                    dadosUnidades.unidadesDeSaude.push(...unidadeCompleta.unidadesDeSaude)
                 }
             }
 
@@ -530,5 +625,6 @@ module.exports = {
     pesquisarUnidadePeloNome,
     listarUnidadePeloIdPro,
     listarUnidadesDeSaudeView,
-    listarCategoriaPeloIdView
+    listarCategoriaPeloIdView,
+    listarUnidadePeloIdView
 }
