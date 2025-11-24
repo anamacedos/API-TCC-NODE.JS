@@ -411,6 +411,40 @@ const atualizarUnidadeDeSaude = async function (unidadeDeSaude, idUnidade, conte
     
 }
 
+//função para listar uma categoria pelo seu id PELA VIEW
+const listarCategoriaPeloIdView = async function(idUnidade){
+    try {
+        if(idUnidade == '' || idUnidade == undefined || idUnidade == null || isNaN(idUnidade) || idUnidade  <=0){
+            
+            return MESSAGE.ERROR_REQUIRED_FIELDS
+        }else{
+            let dadosCategoria = {}
+
+            let resultCategoria = await categoriaDAO.listarCategoriaPeloId(parseInt(idCategoria))
+
+            if (resultCategoria != false){
+                if(resultCategoria.length > 0 || typeof(resultCategoria) == 'object'){
+                    //cria um objeto do tipo json para retornar a lista de jogos (o jogo)
+
+                    dadosCategoria.status = true
+                    dadosCategoria.status_code = 200
+                    dadosCategoria.categoria = resultCategoria
+
+                    return dadosCategoria
+                }else{
+                    return MESSAGE.ERROR_NOT_FOUND
+                }
+            }else{
+                return MESSAGE.ERROR_INTERNAL_SERVER_MODEL
+            }
+        }
+    } catch (error) {
+        console.log(error)
+        return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
+
+}
+
 //função para retornar baseado nos filtros
 
 const filtrarUnidadeDeSaude = async function (idEspecialidade, idCategoria, disponibilidade) {
@@ -495,5 +529,6 @@ module.exports = {
     filtrarUnidadeDeSaude,
     pesquisarUnidadePeloNome,
     listarUnidadePeloIdPro,
-    listarUnidadesDeSaudeView
+    listarUnidadesDeSaudeView,
+    listarCategoriaPeloIdView
 }

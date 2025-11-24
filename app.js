@@ -45,6 +45,7 @@ const controllerLocal = require("./controller/local/controllerLocal.js")
 const controllerCategoria = require("./controller/categoria/controllerCategoria.js")
 const controllerEspecialidade = require("./controller/especialidade/controllerEspecialidade.js")
 const controllerEspecialidadeUnidade = require("./controller/unidadesDeSaude/controllerUnidadeEspecialidade")
+const controllerConsulta = require("./controller/consulta/controllerConsulta.js")
 
 
 
@@ -287,7 +288,6 @@ app.get('/v1/pas/especialidade/:id', cors(), async function(request, response){
  * TABELA RELACIONAMENTO DE ESPECIALIDADE E CATEGORIA
  *****************************************************************/
 
-
 //END POINT PARA RETORNAR O TEMPO DE ESPERA BASEADO NO ID DA UNIDADE E DA ESPECIALIDADE
 app.post('/v1/pas/tempo', cors(), bodyParserJSON, async function(request, response) {
         let contentType = request.headers['content-type']
@@ -300,7 +300,23 @@ app.post('/v1/pas/tempo', cors(), bodyParserJSON, async function(request, respon
         response.json(resultTempoDeEspera)
         
 })
-    
+
+
+/***************************************************************** 
+ * TABELA DE CONSULTA 
+ *****************************************************************/
+//END PONIT PARA INSERIR UMA CONSULTA
+app.post('/v1/pas/consulta', cors(), bodyParserJSON, async function(request, response) {
+        let contentType = request.headers['content-type']
+
+        let dadosBody = request.body
+
+        let resultConsulta = await controllerConsulta.inserirConsulta(dadosBody, contentType)
+
+        response.status(resultConsulta.status_code)
+        response.json(resultConsulta)
+        
+})
 
 app.listen(8080, function(){
     console.log('API aguardando requisições')
