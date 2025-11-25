@@ -48,7 +48,7 @@ const inserirLocal = async function(local) {
 //função para retornar do banco uma lista de todos os locais
 const selecionarTodosLocais = async function () {
     try {
-        let sql = `select * from tbl_local order by id desc`
+        let sql = `select * from tbl_consulta order by id desc`
 
         //para fazer select é o query, para insert, update ou delete é o execute
 
